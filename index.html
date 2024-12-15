@@ -226,7 +226,13 @@
         function updateRequiredElephs() {
             const currentLevel = parseInt(document.getElementById('currentLevel').value);
             const targetLevel = parseInt(document.getElementById('targetLevel').value);
-            const ownedElephs = parseInt(document.getElementById('ownedElephs').value);
+            const ownedElephsInput = document.getElementById('ownedElephs');
+            const ownedElephs = parseInt(ownedElephsInput.value);
+
+            if (ownedElephsInput.value === "" || isNaN(ownedElephs)) {
+                document.getElementById('elephsNeeded').innerHTML = `请输入已有神明文字的数量。`;
+                return;
+            }
 
             let totalElephs = 0;
             for (let i = currentLevel; i < targetLevel; i++) {
