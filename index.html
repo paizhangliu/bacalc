@@ -138,7 +138,7 @@
         </div>
 
         <div id="content-direct" class="tab-content">
-            <label for="requiredElephs">输入所需神明文字数量：</label>
+            <label for="requiredElephs">所需神明文字数量：</label>
             <div class="input-container">
                 <input type="number" id="requiredElephs" min="1" max="630" oninput="validateElephInput()" placeholder="输入所需神明文字">
             </div>
@@ -230,7 +230,7 @@
             const ownedElephs = parseInt(ownedElephsInput.value);
 
             if (ownedElephsInput.value === "" || isNaN(ownedElephs)) {
-                document.getElementById('elephsNeeded').innerHTML = `请输入已有神明文字的数量。`;
+                document.getElementById('elephsNeeded').innerHTML = `请输入已有神明文字数量。`;
                 return;
             }
 
@@ -241,8 +241,8 @@
 
             totalElephs -= ownedElephs;
             document.getElementById('elephsNeeded').innerHTML = totalElephs > 0 
-                ? `您需要购买 <strong>${totalElephs}</strong> 神明文字。`
-                : `您已有足够的神明文字，无需购买。`;
+                ? `需要购买 <strong>${totalElephs}</strong> 神明文字。`
+                : `已有足够的神明文字，无需购买。`;
         }
 
         function calculate() {
