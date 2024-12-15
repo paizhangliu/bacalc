@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>碧蓝档案母猪石计算器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: url('bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        .title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            background-color: #f8f9fa;
+        }
+        .tab.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input, select, button {
+            margin-top: 5px;
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="number"] {
+            margin-right: 0;
+        }
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+        .input-container input {
+            flex: 1;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto 0;
+            text-align: center;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        #totalCost {
+            display: none;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">碧蓝档案母猪石计算器</div>
+        <div class="tabs">
+            <div class="tab active" id="tab-level" onclick="switchTab('level')">通过星级计算</div>
+            <div class="tab" id="tab-direct" onclick="switchTab('direct')">输入所需神明文字数量</div>
+        </div>
+
+        <div id="content-level" class="tab-content active">
+            <div>
+                <label for="currentLevel">当前星级 + 已有神明文字数量：</label>
+                <div style="display: flex; gap: 10px;">
+                    <select id="currentLevel" onchange="updateRequiredElephs()">
+                        <option value="1">1星</option>
+                        <option value="2">2星</option>
+                        <option value="3" selected>3星</option>
+                        <option value="4">4星</option>
+                        <option value="5">专1</option>
+                        <option value="6">专2</option>
+                    </select>
+                    <input type="number" id="ownedElephs" min="0" value="0" oninput="updateRequiredElephs()" placeholder="已有神明文字">
+                </div>
+            </div>
+
+            <label for="targetLevel">目标星级：</label>
+            <select id="targetLevel" onchange="updateRequiredElephs()">
+                <option value="2">2星</option>
+                <option value="3">3星</option>
+                <option value="4">4星</option>
+                <option value="5">专1</option>
+                <option value="6">专2</option>
+                <option value="7" selected>专3</option>
+            </select>
+        </div>
+
+        <div id="content-direct" class="tab-content">
+            <label for="requiredElephs">输入所需神明文字数量：</label>
+            <div class="input-container">
+                <input type="number" id="requiredElephs" min="1" max="630" oninput="validateElephInput()" placeholder="输入所需神明文字">
+            </div>
+        </div>
+
+        <div id="elephResult" class="result" style="margin-top: 20px;">
+            <div id="elephsNeeded">您需要购买 <strong>0</strong> 神明文字。</div>
+        </div>
+
+        <div>
+            <label for="currentPrice">当前单价 + 可购买数量：</label>
+            <div style="display: flex; gap: 10px;">
+                <input type="number" id="currentPrice" min="1" max="5" value="1" placeholder="当前单价" oninput="validateInputs()">
+                <input type="number" id="remainingElephs" min="1" max="20" value="20" placeholder="可购买数量" oninput="validateInputs()">
+            </div>
+        </div>
+
+        <button type="button" onclick="calculate()">计算所需母猪石</button>
+
+        <div id="totalCost" class="result" style="margin-top: 20px;">
+            总共需要 <strong>0</strong> 母猪石。
+        </div>
+    </div>
+
+    <script>
+        const elephRequirements = [30, 80, 100, 120, 120, 180];
+        const maxElephs = elephRequirements.reduce((a, b) => a + b, 0);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateRequiredElephs();
+        });
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(tabElement => {
+                tabElement.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(contentElement => {
+                contentElement.classList.remove('active');
+            });
+
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            document.getElementById(`content-${tab}`).classList.add('active');
+
+            const elephResult = document.getElementById('elephResult');
+            elephResult.style.display = tab === 'direct' ? 'none' : 'block';
+
+            hideTotalCost();
+            clearResults();
+
+            if (tab == 'level') {
+                updateRequiredElephs();  // ChatGPT never got this right for some reason
+            } 
+        }
+
+        function validateElephInput() {
+            const requiredElephsInput = document.getElementById('requiredElephs');
+            let inputValue = parseInt(requiredElephsInput.value);
+
+            if (inputValue > maxElephs) {
+                requiredElephsInput.value = maxElephs;
+            } else if (inputValue < 1 || isNaN(inputValue)) {
+                requiredElephsInput.value = 1;
+            }
+        }
+
+        function validateInputs() {
+            const currentPriceInput = document.getElementById('currentPrice');
+            const remainingElephsInput = document.getElementById('remainingElephs');
+            let currentPrice = parseInt(currentPriceInput.value);
+            let remainingElephs = parseInt(remainingElephsInput.value);
+
+            if (currentPrice > 5) currentPriceInput.value = 5;
+            if (currentPrice < 1) currentPriceInput.value = 1;
+
+            if (remainingElephs > 20) remainingElephsInput.value = 20;
+            if (remainingElephs < 1) remainingElephsInput.value = 1;
+
+            if (currentPrice === 5) {
+                remainingElephsInput.disabled = true;
+            } else {
+                remainingElephsInput.disabled = false;
+            }
+        }
+
+        function updateRequiredElephs() {
+            const currentLevel = parseInt(document.getElementById('currentLevel').value);
+            const targetLevel = parseInt(document.getElementById('targetLevel').value);
+            const ownedElephs = parseInt(document.getElementById('ownedElephs').value);
+
+            let totalElephs = 0;
+            for (let i = currentLevel; i < targetLevel; i++) {
+                totalElephs += elephRequirements[i - 1];
+            }
+
+            totalElephs -= ownedElephs;
+            document.getElementById('elephsNeeded').innerHTML = totalElephs > 0 
+                ? `您需要购买 <strong>${totalElephs}</strong> 神明文字。`
+                : `您已有足够的神明文字，无需购买。`;
+        }
+
+        function calculate() {
+            const currentPrice = parseInt(document.getElementById('currentPrice').value);
+            const remainingElephs = parseInt(document.getElementById('remainingElephs').value);
+            const directInput = document.getElementById('requiredElephs');
+            let totalElephs;
+
+            if (!directInput.disabled && document.getElementById('content-direct').classList.contains('active')) {
+                totalElephs = parseInt(directInput.value);
+            } else {
+                const elephsNeededText = document.getElementById('elephsNeeded').innerText.match(/\d+/);
+                totalElephs = parseInt(elephsNeededText);
+            }
+
+            if (isNaN(totalElephs) || totalElephs <= 0) return;
+
+            let totalCost = 0;
+            let currentRemaining = remainingElephs;
+            let currentPricePerEleph = currentPrice;
+
+            while (totalElephs > 0) {
+                const elephsToBuy = Math.min(currentRemaining, totalElephs);
+                totalCost += elephsToBuy * currentPricePerEleph;
+                totalElephs -= elephsToBuy;
+
+                if (elephsToBuy === currentRemaining) {
+                    currentPricePerEleph = Math.min(5, currentPricePerEleph + 1);
+                    currentRemaining = 20;
+                } else {
+                    currentRemaining -= elephsToBuy;
+                }
+            }
+
+            document.getElementById('totalCost').innerHTML = `总共需要 <strong>${totalCost}</strong> 母猪石。`;
+            document.getElementById('totalCost').style.display = 'block';
+        }
+
+        function hideTotalCost() {
+            document.getElementById('totalCost').style.display = 'none';
+        }
+
+        function clearResults() {
+            document.getElementById('elephsNeeded').innerHTML = '您需要购买 <strong>0</strong> 神明文字。';
+        }
+    </script>
+</body>
+</html>
